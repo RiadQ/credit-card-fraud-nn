@@ -82,10 +82,10 @@ class NeuralNetwork:
                     print(f'Epoch: {epoch + 1} Example: {loop}')
                     loop += 1
 
-                self.h1.W -= np.mean(np.stack(w1_grad), axis=0)
-                self.h2.W -= np.mean(np.stack(w2_grad), axis=0)
-                self.o1.W -= np.mean(np.stack(w3_grad), axis=0)
+                self.h1.W -= self.learn_rate * np.mean(np.stack(w1_grad), axis=0)
+                self.o1.W -= self.learn_rate * np.mean(np.stack(w3_grad), axis=0)
+                self.h2.W -= self.learn_rate * np.mean(np.stack(w2_grad), axis=0)
 
-                self.h1.b -= np.mean(np.stack(b1_grad), axis=0)
-                self.h2.b -= np.mean(np.stack(b2_grad), axis=0)
-                self.o1.b -= np.mean(np.stack(b3_grad), axis=0)
+                self.h1.b -= self.learn_rate * np.mean(np.stack(b1_grad), axis=0)
+                self.h2.b -= self.learn_rate * np.mean(np.stack(b2_grad), axis=0)
+                self.o1.b -= self.learn_rate * np.mean(np.stack(b3_grad), axis=0)
