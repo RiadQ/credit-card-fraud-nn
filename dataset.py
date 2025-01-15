@@ -1,11 +1,16 @@
 import numpy as np
 import pandas as pd
+from smote import synthetic_sample, positive_indicies
 
 
-def load_data(filepath):
+def load_data(filepath, synthetic_samples=None):
     data = pd.read_csv(filepath)
     feature_vectors = data.iloc[:, 1:-1].values.astype(np.float32)
     true_labels = data.iloc[:, -1].values.astype(np.float32)
+    if synthetic_samples:
+        for i in positive_indicies[:synthetic_samples]:
+            synthetic_sample(feature_vectors[i])
+
     return feature_vectors, true_labels
 
 

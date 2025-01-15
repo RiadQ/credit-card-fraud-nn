@@ -37,8 +37,3 @@ def synthetic_sample(vector, k=5):
 
         feature_vectors = np.vstack([feature_vectors, synthetic])
         true_labels = np.append(true_labels, 1)
-
-print(positive_indicies)
-
-print(len(true_features))
-print(le
