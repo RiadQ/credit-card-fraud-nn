@@ -5,7 +5,7 @@ from random import randint
 
 
 if __name__ == '__main__':
-    x, y = load_data('creditcard.csv', 5)
+    x, y = load_data('creditcard.csv', 100)
     batches = create_mini_batches(x, y, 32)
 
     model = NeuralNetwork(batches)
