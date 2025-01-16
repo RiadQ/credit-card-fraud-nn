@@ -3,13 +3,67 @@ import pandas as pd
 from smote import synthetic_sample, positive_indicies
 
 
+def calculate_nearest_neighbour(yTrue_vector):
+    distances = []
+    global true_features
+    for vector in true_features:
+        sums = 0
+        for i, value in enumerate(yTrue_vector):
+            sums += (value - vector[i])**2
+        
+        sums = np.sqrt(sums)
+        distances.append(sums)
+
+    return distances
+
+
+def synthetic_sample(vector, feature_vectors, k=5):
+    enumerated = list(enumerate(calculate_nearest_neighbour(vector)))
+    sorted_pairs = sorted(enumerated, key=lambda x: x[1])
+    nearest = sorted_pairs[:k]
+    l = np.random.uniform(0, 1)
+    for d in nearest:
+        global true_labels
+        n = true_features[d[0]]
+        synthetic = vector + l * (n - vector)
+
+        feature_vectors = np.vstack([feature_vectors, synthetic])
+        true_labels = np.append(true_labels, 1)
+
+
+
+
 def load_data(filepath, synthetic_samples=None):
     data = pd.read_csv(filepath)
     feature_vectors = data.iloc[:, 1:-1].values.astype(np.float32)
     true_labels = data.iloc[:, -1].values.astype(np.float32)
+
+    positive_indicies = np.where(true_labels == 1)[0]
+    true_features = feature_vectors[positive_indicies]
+
     if synthetic_samples:
-        for i in positive_indicies[:synthetic_samples]:
-            synthetic_sample(feature_vectors[i])
+        for vector in positive_indicies[:synthetic_samples]:
+            
+            distances = []
+            for vector in true_features:
+                sums = 0
+                for i, value in enumerate(vector):
+                    sums += (value - vector[i])**2
+                    
+                    sums = np.sqrt(sums)
+                    distances.append(sums)
+            
+            enumerated = list(enumerate(distances))
+            sorted_pairs = sorted(enumerated, key=lambda x: x[1])
+            nearest = sorted_pairs[:1]
+            l = np.random.uniform(0, 1)
+
+            for d in nearest:
+                n = true_features[d[0]]
+                synthetic = vector + l * (n - vector)
+
+                feature_vectors = np.vstack([feature_vectors, synthetic])
+                true_labels = np.append(true_labels, 1)
 
     return feature_vectors, true_labels
 
