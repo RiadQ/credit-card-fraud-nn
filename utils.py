@@ -1,15 +1,11 @@
 import numpy as np
-import pandas as pd
 
 
 def leaky_relu(x):
-    # return np.maximum(x, 0)
     return np.where(x > 0, x, 0.01 * x)
 
 
-
 def deriv_leaky_relu(x):
-    # return np.where(x > 0, 1, 0)
     return np.where(x > 0, 1, 0.01)
 
 

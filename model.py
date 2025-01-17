@@ -28,6 +28,7 @@ class NeuralNetwork:
         self.epochs = 10
         self.learn_rate = 0.1
         self.batches = batches
+        self.lambda_reg = 0.1
 
     def compute(self, x):
         self.h1_out = self.h1.feedforward(x)
@@ -48,18 +49,19 @@ class NeuralNetwork:
                 for vector, label in zip(*batch):
                     vector = normalize_features(vector)
                     yPred = self.compute(vector)
+
                     loss = bce_loss(label, yPred)
                     
                     dL_dy = clip_gradients(deriv_bce(label, yPred))
                     dy_do1 = clip_gradients(yPred * (1 - yPred))
                     do1_dx3 = self.o1.W.T
-                    dx3_h2 = deriv_leaky_relu(np.dot(self.h2.W, self.h1_out) + self.h2.b)
+                    dx3_dh2 = deriv_leaky_relu(np.dot(self.h2.W, self.h1_out) + self.h2.b)
                     dh2_dx2 = self.h2.W.T
                     dx2_dh1 = deriv_leaky_relu(np.dot(self.h1.W, vector) + self.h1.b)
 
                     dL_do1 = clip_gradients(dL_dy * dy_do1)
                     dL_dx3 = clip_gradients(dL_do1 * do1_dx3.T)
-                    dL_dh2 = clip_gradients(dL_dx3 @ dx3_h2)
+                    dL_dh2 = clip_gradients(dL_dx3 @ dx3_dh2)
                     dL_dx2 = clip_gradients(dL_dh2 * dh2_dx2.T)
                     dL_dh1 = clip_gradients(dL_dx2 @ dx2_dh1)
 
@@ -79,7 +81,8 @@ class NeuralNetwork:
                     b2_grad.append(dL_db2)
                     b3_grad.append(dL_db3)
 
-                    print(f'Epoch: {epoch + 1} Example: {loop}')
+                    print(f'Epoch: {epoch + 1} Example: {loop} Loss: {loss}')
+
                     loop += 1
 
                 self.h1.W -= self.learn_rate * np.mean(np.stack(w1_grad), axis=0)
@@ -89,3 +92,5 @@ class NeuralNetwork:
                 self.h1.b -= self.learn_rate * np.mean(np.stack(b1_grad), axis=0)
                 self.h2.b -= self.learn_rate * np.mean(np.stack(b2_grad), axis=0)
                 self.o1.b -= self.learn_rate * np.mean(np.stack(b3_grad), axis=0)
+
+            self.learn_rate *= 0.5
